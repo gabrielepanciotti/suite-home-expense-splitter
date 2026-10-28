@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@import "@suite/design-system/theme.css";
+@import "./suite-theme.css";
+@source "../node_modules/@suite/design-system/dist/**/*.{js,cjs}";
+@source "../node_modules/@suite/i18n/dist/**/*.{js,cjs}";

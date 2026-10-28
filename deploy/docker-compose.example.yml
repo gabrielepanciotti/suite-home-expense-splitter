@@ -1,0 +1,53 @@
+# Public development example. Copy and adapt through .env; do not put credentials here.
+# Run `bash deploy/prebuild.sh` first when using the Life framework from a sibling checkout.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: homeexpensesplitter
+      POSTGRES_USER: homeexpensesplitter
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    ports:
+      - "${DB_HOST_PORT:-11121}:5432"
+    volumes:
+      - homeexpensesplitter_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U homeexpensesplitter -d homeexpensesplitter"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ..
+      dockerfile: deploy/backend.Dockerfile
+      target: dev
+    environment:
+      DATABASE_URL: postgresql+psycopg://homeexpensesplitter:${DB_PASSWORD:?set DB_PASSWORD in .env}@db:5432/homeexpensesplitter
+      FINANCE_URL: ${FINANCE_URL:-http://host.docker.internal:10023}
+    ports:
+      - "10009:10009"
+    volumes:
+      - ../backend:/app/backend
+      - ../node.config:/app/node.config:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: deploy/frontend.Dockerfile
+      target: dev
+    environment:
+      VITE_BACKEND_PROXY_TARGET: http://backend:10009
+    ports:
+      - "3343:3343"
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  homeexpensesplitter_pgdata:

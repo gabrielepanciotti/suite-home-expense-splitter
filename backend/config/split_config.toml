@@ -1,0 +1,14 @@
+# Canonical split = the workbook's final summary (configurable).
+# Member ids are generic on purpose: NO personal names in tracked files.
+# Device-local display aliases go in the untracked .env (MEMBER_ALIASES_JSON).
+
+# Categories excluded from the split (still expenses, but not divided)
+escluse = ["AMAZON", "TECNOLOGIA / ELETTRONICA (condivisa)", "ACQUISTI VARI (condivisi)"]
+
+[percentuali]
+member_a = 50
+member_b = 50
+
+[persone]
+member_a = "Member A"
+member_b = "Member B"
